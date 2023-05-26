@@ -1,4 +1,4 @@
-This Python-based tool uses Pulumi to dynamically create cloud resources on Google Cloud Platform (GCP) based on a YAML configuration file.
+This Python-based tool uses Pulumi to dynamically create resources on Kubernetes using data-driven infrastructure as code concepts.
 
 ## Dependencies
 - Python 3.7+
