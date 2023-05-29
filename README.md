@@ -11,10 +11,12 @@ Python packages:
 - dataclass-wizard
 - py-automapper
 
-Install them with pip:
+To get going clone the repo and run
 ```bash
-pip install -r requirements.txt
+pulumi up
 ```
+This will install dependencies and setup a venv for you.
+
 ## Usage
 
 Just ensure you are in the right context of the cluster you want to build in!!!!
