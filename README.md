@@ -3,17 +3,17 @@ This Python-based tool uses Pulumi to dynamically create resources on Kubernetes
 ## Dependencies
 - Python 3.7+
 - Pulumi
-- Google Cloud SDK (if running locally)
+- Kubernetes installed with a cluster you control for the context :)
 
 Python packages:
 - pulumi
 - pulumi-kubernetes
 - dataclass-wizard
-- automapper
+- py-automapper
 
 Install them with pip:
 ```bash
-pip install pulumi pulumi-google-native dataclass-wizard automapper
+pip install -r requirements.txt
 ```
 ## Usage
 
