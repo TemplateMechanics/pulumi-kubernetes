@@ -20,7 +20,7 @@ pip install pulumi pulumi-google-native dataclass-wizard automapper
 Just ensure you are in the right context of the cluster you want to build in!!!!
 ```
 Populate the `config.yaml` file according to your needs here is a sample:
-```yaml
+```
 teams:
   - name: team1
     services:
