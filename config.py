@@ -8,6 +8,25 @@ class ObjectMetaArgs:
     labels: Optional[dict[str, str]] = None
     annotations: Optional[dict[str, str]] = None
 @dataclass
+class SecretInitArgs:
+    data: Optional[Dict[str, str]] = None
+    immutable: Optional[bool] = None
+    metadata: Optional[Dict[str, ObjectMetaArgs]] = None
+    string_data: Optional[Dict[str, str]] = None
+    type: Optional[str] = None
+@dataclass
+class Secrets:
+    name: str
+    id: Optional[str] = None
+    args: Optional[SecretInitArgs] = None
+### https://www.pulumi.com/registry/packages/kubernetes/api-docs/core/v1/secret/ ###
+@dataclass
+class ObjectMetaArgs:
+    name: Optional[str] = None
+    namespace: Optional[str] = None
+    labels: Optional[dict[str, str]] = None
+    annotations: Optional[dict[str, str]] = None
+@dataclass
 class NamespaceSpecArgs:
     finalizers: Optional[List[str]] = None
 @dataclass
@@ -23,6 +42,7 @@ class Namespaces:
 @dataclass
 class Kubernetes:
     namespaces: Optional[List[Namespaces]]
+    secrets: Optional[List[Secrets]]
 ### https://www.pulumi.com/registry/packages/kubernetes/api-docs/ ###
 @dataclass
 class Environment:

@@ -139,6 +139,24 @@ class Namespaces(BaseResource):
         args.app_labels = self.context.app_labels
         namespace_init_args = mapper.to(core.v1.NamespaceInitArgs).map(args, use_deepcopy=False, skip_none_values=True)
         return core.v1.Namespace(self.context.get_default_resource_name(self.name), args=namespace_init_args)
+    
+class Secrets(BaseResource):
+
+    def __init__(self, name: str, context: BuildContext):
+        super().__init__(name, context)
+    
+    async def find(self, id: Optional[str] = None) -> Optional[core.v1.Secret]:
+        if not id:
+            return None
+
+        return core.v1.Secret.get(self.context.get_default_resource_name(self.name), id)
+    
+    async def create(self, args: config.SecretInitArgs) -> core.v1.Secret:
+        # args.name = self.context.get_default_resource_name(self.name)
+        # args.namespace = args.namespace or pulumi.warn("Secrets must be created in a namespace")
+        args.app_labels = self.context.app_labels
+        secret_init_args = mapper.to(core.v1.SecretInitArgs).map(args, use_deepcopy=False, skip_none_values=True)
+        return core.v1.Secret(self.context.get_default_resource_name(self.name), args=secret_init_args)
 
 #endregion
 
@@ -150,6 +168,7 @@ class ResourceBuilder:
 
     async def build(self, config: config.Kubernetes):
         await self.build_namespaces(config.namespaces)
+        await self.build_secrets(config.secrets)
     
     async def build_namespaces(self, configs: Optional[list[config.Namespaces]] = None):
         if configs is None:
@@ -159,17 +178,10 @@ class ResourceBuilder:
             namespaces = Namespaces(config.name, self.context)
             await namespaces.build(config.id, config.args)
 
-# app_labels = { "app": "nginx" }
+    async def build_secrets(self, configs: Optional[list[config.Secrets]] = None):
+        if configs is None:
+            return
 
-# deployment = Deployment(
-#     "nginx",
-#     spec=DeploymentSpecArgs(
-#         selector=LabelSelectorArgs(match_labels=app_labels),
-#         replicas=1,
-#         template=PodTemplateSpecArgs(
-#             metadata=ObjectMetaArgs(labels=app_labels),
-#             spec=PodSpecArgs(containers=[ContainerArgs(name="nginx", image="nginx")])
-#         ),
-#     ))
-
-# pulumi.export("name", deployment.metadata["name"])
+        for config in configs:
+            secrets = Secrets(config.name, self.context)
+            await secrets.build(config.id, config.args)
