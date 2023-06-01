@@ -1,7 +1,7 @@
 import asyncio
 from kubernetes import ResourceBuilder, BuildContext
 from config import Config
-# import pprint
+import pprint
 
 def read_yaml_file():
     with open("config.yaml") as config_yaml_file:
@@ -12,7 +12,7 @@ async def main():
     read_yaml : str = read_yaml_file()
     parsed_yaml : Config = Config.from_yaml(read_yaml)
 
-    # pprint.pprint(parsed_yaml)
+    pprint.pprint(parsed_yaml)
 
     # Iterate through the teams, services, and environments in the YAML configuration
     # Each environment will contain configurations for different modules in the Pulumi Registry
@@ -21,10 +21,9 @@ async def main():
             for environment in service.environments:
 
                 # AzureNative
-                context = BuildContext(team.name, service.name, environment.name, environment.location, environment.project, environment.app_labels or {})
+                context = BuildContext(team.name, service.name, environment.name, environment.location, environment.project)
                 builder = ResourceBuilder(context)
                 await builder.build(environment.kubernetes)
 
 if __name__ == "__main__":
     asyncio.ensure_future(main())
-

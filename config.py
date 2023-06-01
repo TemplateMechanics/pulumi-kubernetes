@@ -1,6 +1,7 @@
 from dataclass_wizard import YAMLWizard, asdict
 from typing import Dict, Any, Sequence ,Optional, List
 from dataclasses import dataclass, field
+### https://www.pulumi.com/registry/packages/kubernetes/api-docs/core/v1/serviceaccount/ ###
 @dataclass
 class ObjectMetaArgs:
     name: Optional[str] = None
@@ -10,34 +11,38 @@ class ObjectMetaArgs:
 @dataclass
 class SecretInitArgs:
     data: Optional[Dict[str, str]] = None
+    metadata: Optional[ObjectMetaArgs] = None
+    namespace: Optional[str] = None
     immutable: Optional[bool] = None
-    metadata: Optional[Dict[str, ObjectMetaArgs]] = None
     string_data: Optional[Dict[str, str]] = None
     type: Optional[str] = None
 @dataclass
 class Secrets:
-    name: str
+    name: Optional[str] = None
+    api_version: Optional[str] = None
+    kind: Optional[str] = None
     id: Optional[str] = None
     args: Optional[SecretInitArgs] = None
+    # metadata: Optional[ObjectMetaArgs] = None
 ### https://www.pulumi.com/registry/packages/kubernetes/api-docs/core/v1/secret/ ###
-@dataclass
-class ObjectMetaArgs:
-    name: Optional[str] = None
-    namespace: Optional[str] = None
-    labels: Optional[dict[str, str]] = None
-    annotations: Optional[dict[str, str]] = None
 @dataclass
 class NamespaceSpecArgs:
     finalizers: Optional[List[str]] = None
 @dataclass
 class NamespaceInitArgs:
-    metadata: Optional[Dict[str, ObjectMetaArgs]] = None
+    string_data: Optional[Dict[str, str]] = None
+    metadata: Optional[ObjectMetaArgs] = None
+    immutable: Optional[bool] = None
+    type: Optional[str] = None
     spec: Optional[Dict[str, NamespaceSpecArgs]] = None
 @dataclass
 class Namespaces:
-    name: str
+    name: Optional[str] = None
+    api_version: Optional[str] = None
+    kind: Optional[str] = None
     id: Optional[str] = None
     args: Optional[NamespaceInitArgs] = None
+    metadata: Optional[ObjectMetaArgs] = None
 ### https://www.pulumi.com/registry/packages/kubernetes/api-docs/core/v1/namespace/ ###
 @dataclass
 class Kubernetes:
@@ -47,7 +52,6 @@ class Kubernetes:
 @dataclass
 class Environment:
     name: str
-    app_labels: Optional[dict[str, str]] = None
     location: Optional[str] = None
     project: Optional[str] = None
     kubernetes: Optional[Kubernetes] = None

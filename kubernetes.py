@@ -22,7 +22,6 @@ class BuildContext:
     environment: str
     location: str
     project: str
-    app_labels: dict[str, str]
 
     resource_cache: dict = field(init=False, repr=False, default_factory=dict)
 
@@ -58,7 +57,7 @@ class BaseResource(ABC):
         pass
 
     @abstractmethod
-    async def create(self, args: any) -> pulumi.CustomResource:
+    async def create(self, args: any, metadata: Optional[meta.v1.ObjectMetaArgs] = None) -> pulumi.CustomResource:
         pass
 
     async def getResourceValue(self, baseResource : pulumi.CustomResource, outputChain : str) -> Optional[str]:
@@ -112,16 +111,16 @@ class BaseResource(ABC):
     async def build(self, id: Optional[str] = None, args: Optional[any] = None) -> None:
         if id is not None:
             try:
-                resource_group = await self.find(id)
+                namespaces = await self.find(id)
             except Exception as e:
                 pulumi.log.warn(f"Failed to find existing resource group with id {id}: {e}")
                 return
 
         if args is not None:
-            await self.replaceInputArgs(args);
-            resource_group = await self.create(args)
+            await self.replaceInputArgs(args)
+            namespaces = await self.create(args) 
 
-        await self.context.add_resource_to_cache(self.name, resource_group)
+        await self.context.add_resource_to_cache(self.name, namespaces)
 
 class Namespaces(BaseResource):
 
@@ -135,16 +134,16 @@ class Namespaces(BaseResource):
         return core.v1.Namespace.get(self.context.get_default_resource_name(self.name), id)
     
     async def create(self, args: config.NamespaceInitArgs) -> core.v1.Namespace:
-        # args.name = self.context.get_default_resource_name(self.name)
-        args.app_labels = self.context.app_labels
         namespace_init_args = mapper.to(core.v1.NamespaceInitArgs).map(args, use_deepcopy=False, skip_none_values=True)
+        namespace_init_args.metadata = meta.v1.ObjectMetaArgs(
+            name=self.context.get_default_resource_name(self.name)
+            )
         return core.v1.Namespace(self.context.get_default_resource_name(self.name), args=namespace_init_args)
     
 class Secrets(BaseResource):
-
     def __init__(self, name: str, context: BuildContext):
         super().__init__(name, context)
-    
+
     async def find(self, id: Optional[str] = None) -> Optional[core.v1.Secret]:
         if not id:
             return None
@@ -152,10 +151,11 @@ class Secrets(BaseResource):
         return core.v1.Secret.get(self.context.get_default_resource_name(self.name), id)
     
     async def create(self, args: config.SecretInitArgs) -> core.v1.Secret:
-        # args.name = self.context.get_default_resource_name(self.name)
-        # args.namespace = args.namespace or pulumi.warn("Secrets must be created in a namespace")
-        args.app_labels = self.context.app_labels
         secret_init_args = mapper.to(core.v1.SecretInitArgs).map(args, use_deepcopy=False, skip_none_values=True)
+        secret_init_args.metadata = meta.v1.ObjectMetaArgs(
+            name=self.context.get_default_resource_name(self.name), 
+            namespace= args.metadata.namespace or self.context.get_default_resource_name
+            )
         return core.v1.Secret(self.context.get_default_resource_name(self.name), args=secret_init_args)
 
 #endregion
@@ -164,7 +164,6 @@ class ResourceBuilder:
 
     def __init__(self, context: BuildContext):
         self.context = context
-        self.app_labels = context.app_labels
 
     async def build(self, config: config.Kubernetes):
         await self.build_namespaces(config.namespaces)
