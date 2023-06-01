@@ -11,12 +11,6 @@ Python packages:
 - dataclass-wizard
 - py-automapper
 
-To get going clone the repo and run
-```bash
-pulumi up
-```
-This will install dependencies and setup a venv for you.
-
 ## Usage
 
 Just ensure you are in the right context of the cluster you want to build in!!!!
@@ -41,7 +35,13 @@ teams:
                     stringData:
                       key1: value1
 ```
-This command will start the deployment of the defined resources to your Kubernetes cluster and builds a namespace with a secret inside the namespace. The key line to understand is the "namespace: Resource ns1, metadata->name" line. This uses the cache to pull the value from the namespace to that if we end up having a unique suffix that we can pass these values without entering them.
+This config will define the resources to be built in your Kubernetes cluster. Currently this will build a namespace with a secret inside the namespace. The key line to understand is the "namespace: Resource ns1, metadata->name" line. This uses the cache to pull the value from the namespace to that if we end up having a unique suffix that we can pass these values without entering them.
+
+To get going clone the repo and run
+```bash
+pulumi up
+```
+This will install dependencies and setup a venv for you.
 
 Debugging and Logs
 
