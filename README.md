@@ -30,15 +30,11 @@ teams:
             kubernetes:
               namespaces:
                - name: ns1
-                 args:
-                   metadata:
-                     annotations: {
-                       pulumi.com/autonamed: 'false'
-                     }
+                 args: []
               secrets:
                 - name: secret1
                   args:
-                    metadata: 
+                    metadata:
                       namespace: Resource ns1, metadata->name
                     type: Opaque
                     stringData:

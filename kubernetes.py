@@ -154,7 +154,7 @@ class Secrets(BaseResource):
         secret_init_args = mapper.to(core.v1.SecretInitArgs).map(args, use_deepcopy=False, skip_none_values=True)
         secret_init_args.metadata = meta.v1.ObjectMetaArgs(
             name=self.context.get_default_resource_name(self.name), 
-            namespace= args.metadata.namespace or self.context.get_default_resource_name
+            namespace= args.metadata.namespace or "default"
             )
         return core.v1.Secret(self.context.get_default_resource_name(self.name), args=secret_init_args)
 
