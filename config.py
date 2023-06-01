@@ -1,13 +1,28 @@
 from dataclass_wizard import YAMLWizard, asdict
 from typing import Dict, Any, Sequence ,Optional, List
 from dataclasses import dataclass, field
-### https://www.pulumi.com/registry/packages/kubernetes/api-docs/core/v1/serviceaccount/ ###
 @dataclass
 class ObjectMetaArgs:
     name: Optional[str] = None
     namespace: Optional[str] = None
     labels: Optional[dict[str, str]] = None
     annotations: Optional[dict[str, str]] = None
+@dataclass
+class ConfigMapInitArgs:
+    data: Optional[Dict[str, str]] = None
+    metadata: Optional[ObjectMetaArgs] = None
+    namespace: Optional[str] = None
+    immutable: Optional[bool] = None
+    string_data: Optional[Dict[str, str]] = None
+    type: Optional[str] = None
+@dataclass
+class ConfigMaps:
+    name: Optional[str] = None
+    api_version: Optional[str] = None
+    kind: Optional[str] = None
+    id: Optional[str] = None
+    args: Optional[ConfigMapInitArgs] = None
+### https://www.pulumi.com/registry/packages/kubernetes/api-docs/core/v1/configmap/ ###
 @dataclass
 class SecretInitArgs:
     data: Optional[Dict[str, str]] = None
@@ -48,6 +63,7 @@ class Namespaces:
 class Kubernetes:
     namespaces: Optional[List[Namespaces]]
     secrets: Optional[List[Secrets]]
+    configmaps: Optional[List[ConfigMaps]]
 ### https://www.pulumi.com/registry/packages/kubernetes/api-docs/ ###
 @dataclass
 class Environment:

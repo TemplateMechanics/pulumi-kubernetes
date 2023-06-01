@@ -158,6 +158,24 @@ class Secrets(BaseResource):
             )
         return core.v1.Secret(self.context.get_default_resource_name(self.name), args=secret_init_args)
 
+class ConfigMaps(BaseResource):
+    def __init__(self, name: str, context: BuildContext):
+        super().__init__(name, context)
+
+    async def find(self, id: Optional[str] = None) -> Optional[core.v1.ConfigMap]:
+        if not id:
+            return None
+
+        return core.v1.ConfigMap.get(self.context.get_default_resource_name(self.name), id)
+    
+    async def create(self, args: config.ConfigMapInitArgs) -> core.v1.ConfigMap:
+        configmap_init_args = mapper.to(core.v1.ConfigMapInitArgs).map(args, use_deepcopy=False, skip_none_values=True)
+        configmap_init_args.metadata = meta.v1.ObjectMetaArgs(
+            name=self.context.get_default_resource_name(self.name), 
+            namespace= args.metadata.namespace if args.metadata.namespace is not None else self.context.get_default_resource_name(self.name)
+            )
+        return core.v1.ConfigMap(self.context.get_default_resource_name(self.name), args=configmap_init_args)
+
 #endregion
 
 class ResourceBuilder:
@@ -168,6 +186,7 @@ class ResourceBuilder:
     async def build(self, config: config.Kubernetes):
         await self.build_namespaces(config.namespaces)
         await self.build_secrets(config.secrets)
+        await self.build_configmaps(config.configmaps)
     
     async def build_namespaces(self, configs: Optional[list[config.Namespaces]] = None):
         if configs is None:
@@ -184,3 +203,11 @@ class ResourceBuilder:
         for config in configs:
             secrets = Secrets(config.name, self.context)
             await secrets.build(config.id, config.args)
+
+    async def build_configmaps(self, configs: Optional[list[config.ConfigMaps]] = None):
+        if configs is None:
+            return
+
+        for config in configs:
+            configmaps = ConfigMaps(config.name, self.context)
+            await configmaps.build(config.id, config.args)
