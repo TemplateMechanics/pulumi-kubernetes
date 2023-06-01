@@ -21,10 +21,9 @@ async def main():
             for environment in service.environments:
 
                 # AzureNative
-                context = BuildContext(team.name, service.name, environment.name, environment.location, environment.project, environment.app_labels or {})
+                context = BuildContext(team.name, service.name, environment.name, environment.location, environment.project)
                 builder = ResourceBuilder(context)
                 await builder.build(environment.kubernetes)
 
 if __name__ == "__main__":
     asyncio.ensure_future(main())
-

@@ -28,15 +28,20 @@ teams:
       - name: svc1
         environments:
           - name: labs
-            app_labels: {
-              CreatedBy: Pulumi
-            }
             kubernetes:
               namespaces:
                - name: ns1
                  args: []
+              secrets:
+                - name: secret1
+                  args:
+                    metadata:
+                      namespace: Resource ns1, metadata->name
+                    type: Opaque
+                    stringData:
+                      key1: value1
 ```
-This command will start the deployment of the defined resources to your Kubernetes cluster
+This command will start the deployment of the defined resources to your Kubernetes cluster and builds a namespace with a secret inside the namespace. The key line to understand is the "namespace: Resource ns1, metadata->name" line. This uses the cache to pull the value from the namespace to that if we end up having a unique suffix that we can pass these values without entering them.
 
 Debugging and Logs
 
